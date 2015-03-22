@@ -29,5 +29,5 @@ return unless require.main is module
 
 libm = load_from_lib 'libm', 'ceil  (   double   ) -> double', 'floor(double) double'
 
-console.log "libm::ceil(3.14159) -> #{libm.ceil 3.14159}"
-console.log "libm::floor(3.14159) -> #{libm.floor 3.14159}"
+console.log "libm::ceil(Math.PI) -> #{libm.ceil Math.PI}"
+console.log "libm::floor(Math.PI) -> #{libm.floor Math.PI}"
