@@ -2,9 +2,9 @@
 # a return value from require()'d scripts (not module.exports)
 { Module } = require 'module'
 
-real_compile = Module::_compile
+old_compile = Module::_compile
 
-Module::_compile = (_, filepath) -> require.cache[filepath].result = real_compile.apply this, arguments
+Module::_compile = (_, filepath) -> require.cache[filepath].result = old_compile.apply this, arguments
 
 ###
 This section is coffeescript-specific.
