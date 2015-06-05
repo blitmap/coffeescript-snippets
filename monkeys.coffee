@@ -30,6 +30,8 @@ String::pad ?= (n = 0, p = ' ') ->
 	return @toString() unless n > @length
 	return @lpad(Math.floor((n + @length) / 2), p).rpad(n, p)
 
+String::reverse ?= -> @toString().split('').reverse().join('')
+
 return unless require.main is module
 
 {strictEqual} = require 'assert'
@@ -70,3 +72,5 @@ strictEqual 'cat'.pad( 7     ), '  cat  ', 'String::pad()'
 strictEqual 'cat'.pad( 0     ),     'cat', 'String::pad()'
 strictEqual 'cat'.pad(-7     ),     'cat', 'String::pad()'
 strictEqual 'cat'.pad( 7, '#'), '##cat##', 'String::pad()'
+
+strictEqual 'cat'.reverse(), 'tac', 'String::reverse()'
