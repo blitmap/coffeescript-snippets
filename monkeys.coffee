@@ -2,11 +2,11 @@ Array::first      ?= -> @[0]
 Array::last_index ?= -> @length - 1
 Array::last       ?= -> @[@last_index()]
 
-Array::equal ?= (o, deep = true) ->
+Array::equal ?= (o) ->
 	return true  if o is @
 	return false unless o instanceof Array
 	return false unless @length is o.length
-	return false for v, i in @ when not (v instanceof Array and deep and v.equal(o[i], deep) or v is o[i])
+	return false for v, i in @ when not (v instanceof Array and v.equal(o[i]) or v is o[i])
 	return true
 
 Array::strict_equal ?= (o) -> @equal o, false
@@ -32,6 +32,11 @@ String::pad ?= (n = 0, p = ' ') ->
 
 String::reverse ?= -> @toString().split('').reverse().join('')
 
+Number::bit ?= (i, b) ->
+	n = @valueOf()
+	return n ^ (-b ^ n) & (1 << i) if b?
+	return !!(n >> i & 1)
+
 return unless require.main is module
 
 {strictEqual} = require 'assert'
@@ -45,10 +50,7 @@ strictEqual x.last(),       x[x.length - 1], 'Array::last()'
 strictEqual ['a']       .equal(['a']),            true,  'Array::equal()'
 strictEqual ['a']       .equal(['b']),            false, 'Array::equal()'
 strictEqual ['a', []]   .equal(['a', []]),        true,  'Array::equal()'
-strictEqual ['a', []]   .equal(['a', []], false), false, 'Array::equal()'
 strictEqual ['a', ['b']].equal(['a', ['b']]),     true,  'Array::equal()'
-
-strictEqual [[]].strict_equal([[]]), false, 'Array::strict_equal()'
 
 strictEqual ['a', 'b'].repeat( 0).equal([]), true, 'Array::repeat()'
 strictEqual ['a', 'b'].repeat(-1).equal([]), true, 'Array::repeat()'
@@ -74,3 +76,10 @@ strictEqual 'cat'.pad(-7     ),     'cat', 'String::pad()'
 strictEqual 'cat'.pad( 7, '#'), '##cat##', 'String::pad()'
 
 strictEqual 'cat'.reverse(), 'tac', 'String::reverse()'
+
+strictEqual (2).bit(1), true, 'Number::bit()'
+strictEqual (4).bit(2), true, 'Number::bit()'
+strictEqual (8).bit(3), true, 'Number::bit()'
+
+strictEqual (2).bit(1, false), 0, 'Number::bit()'
+strictEqual (0).bit(1, true ), 2, 'Number::bit()'
