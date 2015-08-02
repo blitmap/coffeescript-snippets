@@ -5,4 +5,4 @@
 
 compile = Module::_compile
 
-Module::_compile = (_, path) -> require.cache[path].result = compile arguments...
+Module::_compile = (_, path) -> require.cache[path].result = compile.apply this, arguments

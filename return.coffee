@@ -8,4 +8,4 @@ compile = Module::_compile
 Module::_compile = (args...) ->
 	args[0] = args[0].replace /^\(function\s*\(\)\s*{/, 'return $&'
 
-	compile args...
+	compile.apply this, args
