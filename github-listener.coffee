@@ -3,8 +3,8 @@ express        = require 'express'
 logger         = require('morgan') 'combined'
 
 # [ 'coffee', 'thiss.coffee', 'arg1', 'arg2' ]
-rport = process.env.RPORT or '5000'
-sport = process.env.SPORT or +rport + 1
+rport = process.env.RPORT or process.argv[2] or '5000'
+sport = process.env.SPORT or process.argv[3] or +rport + 1
 
 sigcheck = (req, res, next) ->
 	for t in process.env.GITHUB_SECRET_TOKEN.split ','
