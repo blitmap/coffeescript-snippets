@@ -8,9 +8,6 @@ C.year   = C.day    * 365
 C.month  = C.year   / 12  # imo, best approx.
 
 fuzzy = (time) ->
-	if time instanceof Date
-		time = (new Date) - time
-
 	time = Math.abs time
 
 	o = []
