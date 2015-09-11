@@ -39,7 +39,7 @@ Number::bit ?= (i, b) ->
 
 return unless require.main is module
 
-{strictEqual} = require 'assert'
+{ strictEqual } = require 'assert'
 
 x = [ 'a', 'b', 'c' ]
 
