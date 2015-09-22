@@ -31,7 +31,7 @@ new_slave = ->
 	wpid = w.process.pid # saved for .on('exit')
 	w.on 'message', (msg) -> conns++ if msg is 'request'
 	w.on 'exit', (w, code, signal) ->
-		log "worker(#{wpid}) died (#{code or signal})"
+		log "worker(#{wpid}) exited (#{code or signal})"
 		if cat
 			log 'spawning replacement worker'
 			new_slave()
@@ -52,7 +52,7 @@ if cluster.isMaster
 s = createServer (req, res) ->
 	process.send 'request'
 
-	logger req, res, (->) # I don't know why this is necessary.
+	logger req, res, (->) # middleware outside express, lulz
 
 	# XXX: support not having PATH_TRANSLATED available
 	# nginx reverse-proxy also guarantees it's in document root + exists
