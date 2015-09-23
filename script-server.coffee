@@ -27,14 +27,9 @@ log        = (s) ->
 	console.log "#{now}  #{from}(#{process.pid}): #{s}"
 
 new_slave = ->
-	w    = cluster.fork()
-	wpid = w.process.pid # saved for .on('exit')
+	w = cluster.fork()
 	w.on 'message', (msg) -> conns++ if msg is 'request'
-	w.on 'exit', (w, code, signal) ->
-		log "worker(#{wpid}) exited (#{code or signal})"
-		if cat
-			log 'spawning replacement worker'
-			new_slave()
+	log "forked new worker(#{w.process.pid})"
 
 if cluster.isMaster
 	conns = 0
@@ -45,8 +40,15 @@ if cluster.isMaster
 			prev = conns
 			log "timer(every 30s if different): connections = #{conns}"
 
-	log "spawning #{workers} workers"
+	log "creating #{workers} workers"
 	new_slave() for i in [ 1 .. workers ]
+
+	cluster.on 'exit', (w, code, signal) ->
+		log "worker(#{w.process.pid}) exited (#{code or signal})"
+		if cat
+			log "reincarnating worker(#{w.process.pid})"
+			new_slave()
+
 	return
 
 s = createServer (req, res) ->
