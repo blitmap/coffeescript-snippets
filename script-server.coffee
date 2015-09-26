@@ -4,7 +4,6 @@ cluster                           = require 'cluster'
 logger                            = require('morgan') 'combined'
 urlparse                          = require('url').parse
 { createServer }                  = require 'http'
-{ isNullOrUndefined, isFunction } = require 'util'
 
 cat        = process.env.ILIVEIDIEILIVEAGAIN
 port       = process.argv[2] or process.env.PORT or 9999
@@ -26,7 +25,7 @@ workers ?= process.env.WORKERS or require('os').cpus().length + 1
 scriptroot = path.join webroot, scriptroot, '/'
 
 onInterval = (t, f) -> setInterval f, t # swap args for coffeescript
-isIterator = (x) -> (not isNullOrUndefined(x)) and isFunction(x.next) and x[Symbol.iterator]?
+isIterator = (x) -> x? and x[Symbol.iterator]? and x.next instanceof Function
 log        = (s) ->
 	now  = (new Date).toLocaleTimeString()
 	from = cluster.isMaster and 'master' or 'worker'
