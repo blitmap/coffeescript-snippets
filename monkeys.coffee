@@ -58,7 +58,6 @@ strictEqual ['a', 'b'].repeat( 3).equal(['a', 'b', 'a', 'b', 'a', 'b']), true, '
 
 strictEqual 'ab'.repeat( 3), 'ababab', 'String::repeat()'
 strictEqual 'ab'.repeat( 0),       '', 'String::repeat()'
-strictEqual 'ab'.repeat(-3),       '', 'String::repeat()'
 
 strictEqual 'cat'.lpad( 5     ), '  cat', 'String::lpad()'
 strictEqual 'cat'.lpad( 0     ),   'cat', 'String::lpad()'
