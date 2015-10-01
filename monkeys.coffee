@@ -37,6 +37,8 @@ Number::bit ?= (i, b) ->
 	return n ^ (-b ^ n) & (1 << i) if b?
 	return !!(n >> i & 1)
 
+Object::values ?= (o) -> (v for own _, v of o)
+
 return unless require.main is module
 
 { strictEqual } = require 'assert'
@@ -82,3 +84,5 @@ strictEqual (8).bit(3), true, 'Number::bit()'
 
 strictEqual (2).bit(1, false), 0, 'Number::bit()'
 strictEqual (0).bit(1, true ), 2, 'Number::bit()'
+
+strictEqual Object.values({ a: 'cat', b: 'dog', c: 'rat', d: 'horse' })[2], 'rat', 'Object::values()'
