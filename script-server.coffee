@@ -1,28 +1,16 @@
-fs                                = require 'fs'
-path                              = require 'path'
-cluster                           = require 'cluster'
-logger                            = require('morgan') 'combined'
-urlparse                          = require('url').parse
-{ createServer }                  = require 'http'
+fs               = require 'fs'
+path             = require 'path'
+cluster          = require 'cluster'
+logger           = require('morgan') 'combined'
+urlparse         = require('url').parse
+{ createServer } = require 'http'
 
-cat        = process.env.ILIVEIDIEILIVEAGAIN
-port       = process.argv[2] or process.env.PORT or 9999
-host       = null
-workers    = null
-webroot    = '/srv/http'
-scriptroot = 'exe/node'
+# meow
+{ CAT, HOST, PORT, WEBROOT, WORKERS } = process.env
 
-# coffee --nodejs --harmony appserver [, port][, host][, workers]
-if process.argv[4]?
-	workers = process.argv[4]
-	host    = process.argv[3]
-else
-	workers = process.argv[3]
-
-host    ?= process.env.HOST    or 'localhost'
-workers ?= process.env.WORKERS or require('os').cpus().length + 1
-
-scriptroot = path.join webroot, scriptroot, '/'
+HOST    ?= 'localhost'
+PORT    ?= 9999
+WORKERS ?= require('os').cpus().length + 1
 
 onInterval = (t, f) -> setInterval f, t # swap args for coffeescript
 isIterator = (x) -> x? and x[Symbol.iterator]? and x.next instanceof Function
@@ -36,6 +24,11 @@ new_slave = ->
 	w.on 'message', (msg) -> conns++ if msg is 'request'
 	log "forked new worker(#{w.process.pid})"
 
+isolate = (root, what) ->
+	root = path.join root, '/'
+	tmp  = path.join root, what
+	return tmp if tmp.startsWith root
+
 if cluster.isMaster
 	conns = 0
 	prev  = 0
@@ -45,12 +38,12 @@ if cluster.isMaster
 			prev = conns
 			log "timer(every 30s if different): connections = #{conns}"
 
-	log "creating #{workers} workers"
-	new_slave() for i in [ 1 .. workers ]
+	log "creating #{WORKERS} workers"
+	new_slave() for i in [ 1 .. WORKERS ]
 
 	cluster.on 'exit', (w, code, signal) ->
 		log "worker(#{w.process.pid}) exited (#{code or signal})"
-		if cat
+		if CAT
 			log "reincarnating worker(#{w.process.pid})"
 			new_slave()
 
@@ -59,18 +52,17 @@ if cluster.isMaster
 s = createServer (req, res) ->
 	process.send 'request'
 
-	logger req, res, (->) # middleware outside express, lulz
+	logger req, res, (->)
 
 	try
-		reqpath  = req.headers.path_translated
-		reqpath ?= path.join webroot, urlparse(req.url).pathname
+		where = isolate WEBROOT, urlparse(req.url).pathname
 
-		unless reqpath.startsWith scriptroot
+		unless where?
 			res.statusCode = 403
 			res.end()
 			return
 
-		script = require reqpath
+		script = require where
 		script = script.run?(req, res) or script?(req, res)
 
 		if isIterator script
@@ -79,17 +71,18 @@ s = createServer (req, res) ->
 				break if tmp.done
 				res.write tmp.value.toString()
 
-		require.cache[reqpath].watcher ?=
-			fs.watch reqpath, { persistent: false }, (event, filename) ->
-				fs.unwatchFile reqpath
-				log "#{filename} changed; deleting cached copy"
-				delete require.cache[reqpath]
+		require.cache[where].watcher ?=
+			fs.watch where, { persistent: false }, ->
+				log "#{where} changed; deleting cached copy"
+				delete require.cache[where]
+				@close()
 	catch e
+		res.statusCode = 503
 		res.write e.stack
-		delete require.cache[reqpath]
-		fs.unwatchFile reqpath
+		delete require.cache[where]
+		fs.unwatchFile where
 
 	res.end()
 
-s.listen port, host
-log "listening on #{host}:#{port}"
+s.listen PORT, HOST
+log "listening on #{HOST}:#{PORT}"
