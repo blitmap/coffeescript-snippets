@@ -1,6 +1,7 @@
 fs               = require 'fs'
 path             = require 'path'
 cluster          = require 'cluster'
+assert           = require 'assert'
 logger           = require('morgan') 'combined'
 urlparse         = require('url').parse
 { createServer } = require 'http'
@@ -11,6 +12,9 @@ urlparse         = require('url').parse
 HOST    ?= 'localhost'
 PORT    ?= 9999
 WORKERS ?= require('os').cpus().length + 1
+
+# I want coercion here
+assert WEBROOT
 
 onInterval = (t, f) -> setInterval f, t # swap args for coffeescript
 isIterator = (x) -> x? and x[Symbol.iterator]? and x.next instanceof Function
@@ -38,7 +42,7 @@ if cluster.isMaster
 			prev = conns
 			log "timer(every 30s if different): connections = #{conns}"
 
-	log "creating #{WORKERS} workers"
+	log "creating #{WORKERS} workers; reincarnation: #{CAT?}; WEBROOT=#{WEBROOT}"
 	new_slave() for i in [ 1 .. WORKERS ]
 
 	cluster.on 'exit', (w, code, signal) ->
