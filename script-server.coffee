@@ -62,7 +62,15 @@ s = createServer (req, res) ->
 			res.end()
 			return
 
-		script = require where
+		script = null
+
+		try
+			script = require where
+		catch
+			res.statusCode = 404
+			res.end()
+			return
+
 		script = script.run?(req, res) or script?(req, res)
 
 		if isIterator script
