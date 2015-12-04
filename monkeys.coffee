@@ -9,8 +9,6 @@ Array::equal ?= (o) ->
 	return false for v, i in @ when not (v instanceof Array and v.equal(o[i]) or v is o[i])
 	return true
 
-Array::strict_equal ?= (o) -> @equal o, false
-
 Array::repeat ?= (n = 1) ->
 	tmp = []
 	tmp.push @... while n-- > 0
