@@ -2,11 +2,11 @@ Array::first      ?= -> @[0]
 Array::last_index ?= -> @length - 1
 Array::last       ?= -> @[@last_index()]
 
-Array::equal ?= (o) ->
+Array::equivalent ?= (o) ->
 	return true  if o is @
 	return false unless o instanceof Array
 	return false unless @length is o.length
-	return false for v, i in @ when not (v instanceof Array and v.equal(o[i]) or v is o[i])
+	return false for v, i in @ when not (v instanceof Array and v.equivalent(o[i]) or v is o[i])
 	return true
 
 Array::repeat ?= (n = 1) ->
@@ -47,14 +47,14 @@ strictEqual x.first(),      x[0],            'Array::first()'
 strictEqual x.last_index(), x.length - 1,    'Array::last_index()'
 strictEqual x.last(),       x[x.length - 1], 'Array::last()'
 
-strictEqual ['a']       .equal(['a']),            true,  'Array::equal()'
-strictEqual ['a']       .equal(['b']),            false, 'Array::equal()'
-strictEqual ['a', []]   .equal(['a', []]),        true,  'Array::equal()'
-strictEqual ['a', ['b']].equal(['a', ['b']]),     true,  'Array::equal()'
+strictEqual ['a']       .equivalent(['a']),            true,  'Array::equivalent()'
+strictEqual ['a']       .equivalent(['b']),            false, 'Array::equivalent()'
+strictEqual ['a', []]   .equivalent(['a', []]),        true,  'Array::equivalent()'
+strictEqual ['a', ['b']].equivalent(['a', ['b']]),     true,  'Array::equivalent()'
 
-strictEqual ['a', 'b'].repeat( 0).equal([]), true, 'Array::repeat()'
-strictEqual ['a', 'b'].repeat(-1).equal([]), true, 'Array::repeat()'
-strictEqual ['a', 'b'].repeat( 3).equal(['a', 'b', 'a', 'b', 'a', 'b']), true, 'Array::repeat()'
+strictEqual ['a', 'b'].repeat( 0).equivalent([]), true, 'Array::repeat()'
+strictEqual ['a', 'b'].repeat(-1).equivalent([]), true, 'Array::repeat()'
+strictEqual ['a', 'b'].repeat( 3).equivalent(['a', 'b', 'a', 'b', 'a', 'b']), true, 'Array::repeat()'
 
 strictEqual 'ab'.repeat( 3), 'ababab', 'String::repeat()'
 strictEqual 'ab'.repeat( 0),       '', 'String::repeat()'
