@@ -14,6 +14,8 @@ Array::repeat ?= (n = 1) ->
 	tmp.push @... while n-- > 0
 	return tmp
 
+Array::isEmpty ?= -> @length is 0
+
 String::repeat ?= (n = 1) -> new Array(Math.max(n, 0) + 1).join @
 
 String::lpad ?= (n = 0, p = ' ') ->
@@ -51,6 +53,9 @@ strictEqual ['a']       .equivalent(['a']),            true,  'Array::equivalent
 strictEqual ['a']       .equivalent(['b']),            false, 'Array::equivalent()'
 strictEqual ['a', []]   .equivalent(['a', []]),        true,  'Array::equivalent()'
 strictEqual ['a', ['b']].equivalent(['a', ['b']]),     true,  'Array::equivalent()'
+
+strictEqual [].isEmpty(),    true,  'Array::isEmpty()'
+strictEqual ['x'].isEmpty(), false, 'Array::isEmpty()'
 
 strictEqual ['a', 'b'].repeat( 0).equivalent([]), true, 'Array::repeat()'
 strictEqual ['a', 'b'].repeat(-1).equivalent([]), true, 'Array::repeat()'
