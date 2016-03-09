@@ -2,7 +2,7 @@ fs               = require 'fs'
 path             = require 'path'
 cluster          = require 'cluster'
 assert           = require 'assert'
-logger           = require('morgan') 'combined'
+logger           = require('morgan') 'dev'
 urlparse         = require('url').parse
 { createServer } = require 'http'
 
@@ -40,7 +40,7 @@ if cluster.isMaster
 	onInterval 30000, ->
 		if prev isnt conns
 			prev = conns
-			log "timer(every 30s if different): connections = #{conns}"
+			log "watch(30s): connections = #{conns}"
 
 	log "creating #{WORKERS} workers; reincarnation: #{CAT?}; WEBROOT=#{WEBROOT}"
 	new_slave() for i in [ 1 .. WORKERS ]
