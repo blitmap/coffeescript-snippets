@@ -1,5 +1,6 @@
 # This was a programming exercise I wrote for Triplebyte (3/17/2016)
 # (I was given an hour, I obsessed over it after the interview)
+# updated 3/10/2017; coffeescript has for-from for generators now! :D
 
 require 'colors'
 prompt = require('prompt-sync')()
@@ -73,12 +74,7 @@ class Board
 	isVacant: (c) -> @at(c) is ' '
 
 	# find a vacant coordinate from bottom up in column `x`
-	nextVacantInColumn: (x) ->
-		# XXX: Coffeescript does not [yet] support for-of for generators like ES6
-		iter = @coordsInColumn x
-		until (c = iter.next()).done
-			c = c.value
-			return c if @isVacant c
+	nextVacantInColumn: (x) -> return c for c from @coordsInColumn x when @isVacant c
 			
 	# yield all coordinates on the board from bottom-up, right-to-left
 	coords: -> yield new Coord i for i in  [ @board.last_index() .. 0 ]
@@ -89,14 +85,8 @@ class Board
 	isComplete: -> ' ' not in @board
 
 	isWon: ->
-		# XXX: Coffeescript does not [yet] support for-of for generators like ES6
-		iter = @coords()
-		until (origin = iter.next()).done
-			origin = origin.value
-
-			# avoid matching 4 empty spaces
-			continue if @isVacant origin
-
+		# avoid matching 4 empty spaces
+		for origin from @coords() when not @isVacant origin
 			for _, d of DIRECTION when @matchFour origin, d
 				@markWinningFour origin, d
 				return true
