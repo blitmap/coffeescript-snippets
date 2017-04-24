@@ -1,10 +1,10 @@
-fs               = require 'fs'
-path             = require 'path'
-cluster          = require 'cluster'
-assert           = require 'assert'
-logger           = require('morgan') 'dev'
-urlparse         = require('url').parse
-{ createServer } = require 'http'
+fs                  = require 'fs'
+path                = require 'path'
+cluster             = require 'cluster'
+assert              = require 'assert'
+logger              = require('morgan') 'dev'
+{ createServer }    = require 'http'
+{ parse: urlparse } = require 'url'
 
 # meow
 { CAT, HOST, PORT, WEBROOT, WORKERS } = process.env
@@ -78,10 +78,7 @@ s = createServer (req, res) ->
 		script = script.run?(req, res) or script?(req, res)
 
 		if isIterator script
-			loop
-				tmp = script.next()
-				break if tmp.done
-				res.write tmp.value.toString()
+			res.write tmp.toString() for tmp from script
 
 		require.cache[where].watcher ?=
 			fs.watch where, { persistent: false }, ->
